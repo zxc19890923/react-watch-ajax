@@ -1,0 +1,66 @@
+import React from "react";
+import $ from "jquery";
+// 输入的时候就改变state的值, 然后单击搜索的时候使用值作为查询条件, 查找后台数据,展示列表信息。
+
+// 1. 主组件
+var Main = React.createClass({
+    getInitialState() {
+        return {
+            searchName: 1,
+            data: []
+        }
+    },
+    handleName(event) {
+        this.setState({
+            searchName: event.target.value
+        })
+    },
+    clickData() {
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "./data.json?name=" + this.state.searchName,
+            success: function (result) {
+                this.setState({
+                    data: result
+                })
+            }.bind(this)
+        })
+    },
+    render() {
+        return (
+            <div>
+                <Search searchName={this.state.searchName} handleName={this.handleName} clickEvent={this.clickData}/>
+                <ResultList showList={this.state.data}/>
+            </div>
+        )
+    }
+})
+
+// 2. 子节点
+var Search = React.createClass({
+    render() {
+        return (
+            <div>
+                时事搜索
+                <br/>
+                <input type="text" value={this.props.searchName} onChange={this.props.handleName}/>
+                <input type="button" value="搜索" onClick={this.props.clickEvent}/>
+                <h1>{this.props.searchName}</h1>
+            </div>
+        )
+    }
+})
+
+// 3. 结果
+var ResultList = React.createClass({
+    render() {
+        return (
+            <div>
+                {this.props.showList}
+            </div>
+        )
+    }
+})
+
+export default Main;
